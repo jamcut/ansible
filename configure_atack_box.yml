@@ -1,0 +1,102 @@
+---
+#### Ansible playbook to configure a new attack box
+# Author: @jamcut
+# Version: 0.1
+# Overview: Playbook to install some common attack tools on a fresh box
+# Notes: Run this playbook with the "--ask-become-pass" switch which 
+#        will prompt you for a sudo password to do things as root.
+#
+#        The "hosts" and "remote_user" parameters as well as the
+#        "tool_install_path" variable will need to be set before running.
+# To Do: Metasploit
+#        Other pip packages
+#        Add additional tools
+####
+
+- name: Configure New Attack Box
+  hosts: all
+  remote_user: jamcut
+  vars:
+    tool_install_path: "/tmp/Tools/"
+
+  tasks:
+
+    # Update apt cache and software packages
+    - name: "Update apt cache"
+      become: yes
+      become_method: sudo
+      apt:
+        update_cache: "yes"
+    - name: "Update software packages"
+      become: yes
+      become_method: sudo
+      apt:
+        upgrade: "yes"
+
+    # Install misc tools from git
+
+    - name: "Install recon-ng"
+      git:
+        repo: "https://bitbucket.org/LaNMaSteR53/recon-ng.git"
+        dest: "{{ tool_install_path }}recon-ng/"
+
+    - name: "Install sqlmap"
+      git:
+        repo: "https://github.com/sqlmapproject/sqlmap.git"
+        dest: "{{ tool_install_path }}sqlmap/"
+
+    - name: "Install nikto"
+      git:
+        repo: "https://github.com/sullo/nikto.git"
+        dest: "{{ tool_install_path }}nikto/"
+
+    - name: "Install Responder"
+      git:
+        repo: "https://github.com/SpiderLabs/Responder.git"
+        dest: "{{ tool_install_path }}Responder/"
+
+    - name: "Install AdvancedHTTPServer"
+      pip: name=AdvancedHTTPServer
+
+    - name: "Clone King Phisher"
+      git:
+        repo: "https://github.com/securestate/king-phisher.git"
+        dest: "{{ tool_install_path }}king-phisher/"
+
+    - name: "Install King Phisher Requirements"
+      become: yes
+      become_method: sudo
+      pip: requirements={{ tool_install_path }}king-phisher/requirements.txt
+
+
+    # Install PowerShell tools
+
+    - name: "Install PowerShell Empire"
+      git:
+        repo: "https://github.com/PowerShellEmpire/Empire.git"
+        dest: "{{ tool_install_path }}Empire/"
+    # need to run the setup/install.sh script manually until the issue is resolved
+    # https://github.com/ansible/ansible/issues/13660
+    # - name: "Set up PowerShell Empire"
+    #   expect:
+    #     chdir: "{{ tool_install_path }}Empire/"
+    #     command: "./install.sh"
+    #     responses:
+    #       "password": "\n"
+    #       "continue": "y"
+
+    - name: "Install PowerSploit"
+      git:
+        repo: "https://github.com/PowerShellMafia/PowerSploit.git"
+        dest: "{{ tool_install_path }}PowerSploit/"
+
+    - name: "Install PowerTools"
+      git:
+        repo: "https://github.com/PowerShellEmpire/PowerTools.git"
+        dest: "{{ tool_install_path }}PowerTools/"
+
+    - name: "Install PoshSec"
+      git:
+        repo: "https://github.com/PoshSec/PoshSec.git"
+        dest: "{{ tool_install_path }}PoshSec/"
+
