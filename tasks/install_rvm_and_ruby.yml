@@ -1,0 +1,30 @@
+---
+#### Ansible task file to install RVM and Ruby for MSF
+# Author: @jamcut
+# Version: 0.1
+# Overview: Tasks to configure RVM/Ruby before installing MSF
+# Notes: Include this task file in a Ansible playbook.
+#        
+####
+
+
+- name: "Install RVM and Ruby"
+  tasks:
+
+    - name: "Install RVM"
+      shell: "curl -L https//get.rvm.io | bash -s stable"
+
+    - name: "Source RVM script"  
+      shell: "source ~/.rvm/scripts/rvm"
+
+    - name: "Modify ~/.bashrc"
+      shell: 'echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc'
+
+    - name: "Source ~/.bashrc"
+      shell: "source ~/.bashrc"
+
+    - name: "Install Ruby v 2.1.6"
+      shell: "rvm install 2.1.6"
+
+    - name: "Set default Ruby version"
+      shell: "rvm use 2.1.6 --default"

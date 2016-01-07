@@ -14,14 +14,16 @@
 ####
 
 - name: Configure New Attack Box
-  hosts: all
+  hosts: tests
   remote_user: jamcut
   vars:
     tool_install_path: "/tmp/Tools/"
+    empire_staging_key: "RANDOM"
 
   tasks:
 
     # Update apt cache and software packages
+
     - name: "Update apt cache"
       become: yes
       become_method: sudo
@@ -31,7 +33,23 @@
       become: yes
       become_method: sudo
       apt:
-        upgrade: "yes"
+        upgrade: "dist"
+
+    # Install stuff from apt
+
+    - name: "Install git"
+      become: yes
+      become_method: sudo
+      apt:
+        name: git
+        state: latest
+
+    - name: "Install pip"
+      become: yes
+      become_method: sudo
+      apt:
+        name: python-pip
+        state: latest
 
     # Install misc tools from git
 
@@ -55,19 +73,25 @@
         repo: "https://github.com/SpiderLabs/Responder.git"
         dest: "{{ tool_install_path }}Responder/"
 
-    - name: "Install AdvancedHTTPServer"
-      pip: name=AdvancedHTTPServer
-
     - name: "Clone King Phisher"
       git:
         repo: "https://github.com/securestate/king-phisher.git"
         dest: "{{ tool_install_path }}king-phisher/"
 
-    - name: "Install King Phisher Requirements"
+    # Install additional packages for KP
+
+    - name: "Install GEOS and Basemap with apt"
       become: yes
       become_method: sudo
-      pip: requirements={{ tool_install_path }}king-phisher/requirements.txt
+      action: apt name={{ item }} state=latest
+      with_items:
+        - libgeos++-dev
+        - python-mpltoolkits.basemap
 
+    # - name: "Run King Phisher Install Script"
+    #   become: yes
+    #   become_method: sudo
+    #   shell: '/bin/sh -c "yes | {{ tool_install_path }}king-phisher/tools/install.sh"'
 
     # Install PowerShell tools
 
@@ -75,15 +99,9 @@
       git:
         repo: "https://github.com/PowerShellEmpire/Empire.git"
         dest: "{{ tool_install_path }}Empire/"
-    # need to run the setup/install.sh script manually until the issue is resolved
-    # https://github.com/ansible/ansible/issues/13660
-    # - name: "Set up PowerShell Empire"
-    #   expect:
-    #     chdir: "{{ tool_install_path }}Empire/"
-    #     command: "./install.sh"
-    #     responses:
-    #       "password": "\n"
-    #       "continue": "y"
+
+    - name: "Set up PowerShell Empire"
+      shell: "STAGING_KEY={{ empire_staging_key }} yes | {{ tool_install_path }}Empire/setup/install.sh"
 
     - name: "Install PowerSploit"
       git:
@@ -100,3 +118,63 @@
         repo: "https://github.com/PoshSec/PoshSec.git"
         dest: "{{ tool_install_path }}PoshSec/"
 
+    # Install pip modules
+
+    - name: "Install AdvancedHTTPServer"
+      become: yes
+      become_method: sudo
+      pip: name=AdvancedHTTPServer
+
+    # Install other tools
+
+    #nmap here...
+
+    # Install and configure Metasploit
+    # Following the guide by Carlos Perez
+    # http://www.darkoperator.com/installing-metasploit-in-ubunt/
+
+    - name: "Install MSF dependencies from apt"
+      become: yes
+      become_method: sudo
+      action: apt name={{ item }} state=latest
+      with_items:
+        - build-essential
+        - libreadline-dev
+        - libssl-dev
+        - libpq5
+        - libpq-dev
+        - libreadline5
+        - libsqlite3-dev
+        - libpcap-dev
+        - openjdk-7-jre
+        - git-core
+        - autoconf
+        - postgresql
+        - pgadmin3
+        - curl
+        - zlib1g-dev
+        - libxml2-dev
+        - libxslt1-dev
+        - vncviewer
+        - libyaml-dev
+
+    # Install RVM and Ruby from task file
+    - include: tasks/install_rvm_and_ruby.yml
+
+    # Setup PostgreSQL from task file
+    - include: tasks/configure_postgresql_for_msf.yml
+
+    # Clone Metasploit
+    - name: "Clone Metasploit"
+      git:
+        repo: "https://github.com/rapid7/metasploit-framework.git"
+        dest: "{{ tool_install_path }}metasploit-framework/"
+
+    # Install Metasploit gems
+    - name: "Specify Metasploit Gemset"
+      shell: "rvm --default use ruby-2.1.6@metasploit-framework" 
+      args:
+        chdir: "{{ tool_install_path }}metasploit-framework"
+
+    - name: "Install Metasploit Gems"
+      shell: "gem install bundler && bundle install"
