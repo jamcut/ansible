@@ -167,12 +167,12 @@
       notify:
         - Start PostgreSQL
 
-    # Install and configure Metasploit
-    # Using the omnibus installer and some hackery
-    # Note that this will currently install MSF as root
-    # Meaning that you will have to run it with sudo
+     # Install and configure Metasploit
+     # Using the omnibus installer and some hackery
+     # Note that this will currently install MSF as root
+     # Meaning that you will have to run it with sudo
 
-    # Install PPA from BrightBox
+     # Install PPA from BrightBox
     - name: "Install Software Properties Common"
       become: yes
       become_method: sudo
@@ -253,4 +253,8 @@
       shell: "dpkg -i {{ tool_install_path }}metasploit-omnibus/pkg/*.deb"
 
     - name: "Move MSF database.yml"
-      shell: "mv /home/{{ remote_user_account }}/database.yml /home/{{ remote_user_account }}/.msf4/database.yml"
+      become: yes
+      become_method: sudo
+      shell: "cat /home/{{ remote_user_account }}/database.yml > /opt/metasploit-framework/embedded/framework/config/database.yml"
+      args:
+        executable: /bin/bash
