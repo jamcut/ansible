@@ -1,16 +1,17 @@
 ---
 #### Ansible playbook to configure a new attack box
 # Author: @jamcut
-# Version: 0.1
+# Version: 0.2
 # Overview: Playbook to install some common attack tools on a fresh box
 # Notes: Run this playbook with the "--ask-become-pass" switch which 
 #        will prompt you for a sudo password to do things as root.
 #
-#        The "hosts" and "remote_user" parameters as well as the
-#        "tool_install_path" variable will need to be set before running.
-# To Do: Metasploit
+#        The "hosts" and "remote_user" parameters as well as all
+#        of the variables will need to be set before running.
+# To Do: Nmap
 #        Other pip packages
 #        Add additional tools
+#        Separate into modules
 ####
 
 - name: Configure New Attack Box
@@ -19,6 +20,17 @@
   vars:
     tool_install_path: "/tmp/Tools/"
     empire_staging_key: "RANDOM"
+    msf_db_name: msf
+    msf_db_user: msf
+    msf_db_pass: msf
+    remote_user_account: jamcut
+
+  handlers:
+
+  - name: "Start PostgreSQL"
+    become: yes
+    become_method: sudo
+    service: name=postgresql state=started
 
   tasks:
 
@@ -37,19 +49,18 @@
 
     # Install stuff from apt
 
-    - name: "Install git"
+    - name: "Install Packages"
       become: yes
       become_method: sudo
-      apt:
-        name: git
-        state: latest
-
-    - name: "Install pip"
-      become: yes
-      become_method: sudo
-      apt:
-        name: python-pip
-        state: latest
+      action: apt name={{ item }} state=latest
+      with_items:
+        - git
+        - python-pip
+        - postgresql
+        - libpq-dev
+        - python-psycopg2
+        - subversion
+        - autoconf
 
     # Install misc tools from git
 
@@ -77,6 +88,7 @@
       git:
         repo: "https://github.com/securestate/king-phisher.git"
         dest: "{{ tool_install_path }}king-phisher/"
+        version: dev
 
     # Install additional packages for KP
 
@@ -88,10 +100,10 @@
         - libgeos++-dev
         - python-mpltoolkits.basemap
 
-    # - name: "Run King Phisher Install Script"
-    #   become: yes
-    #   become_method: sudo
-    #   shell: '/bin/sh -c "yes | {{ tool_install_path }}king-phisher/tools/install.sh"'
+    - name: "Run King Phisher Install Script"
+      become: yes
+      become_method: sudo
+      shell: "{{ tool_install_path }}king-phisher/tools/install.sh -y --skip-server"
 
     # Install PowerShell tools
 
@@ -127,54 +139,118 @@
 
     # Install other tools
 
-    #nmap here...
+    # Install Nmap
+    - name: "Check Out Nmap"
+      subversion:
+        repo: https://svn.nmap.org/nmap
+        dest: "{{ tool_install_path }}nmap/"
+
+    - name: "Configure Nmap"
+      shell: "./configure"
+      args:
+        chdir: "{{ tool_install_path }}nmap/"
+
+    - name: "Make Nmap"
+      shell: "make"
+      args:
+        chdir: "{{ tool_install_path }}nmap/"
+
+    - name: "Make Install Nmap"
+      become: yes
+      become_method: sudo
+      shell: "make install"
+      args:
+        chdir: "{{ tool_install_path}}nmap/"
+
+    # Setup PostgreSQL from task file
+    - include: tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }}
+      notify:
+        - Start PostgreSQL
 
     # Install and configure Metasploit
-    # Following the guide by Carlos Perez
-    # http://www.darkoperator.com/installing-metasploit-in-ubunt/
+    # Using the omnibus installer and some hackery
+    # Note that this will currently install MSF as root
+    # Meaning that you will have to run it with sudo
+
+    # Install PPA from BrightBox
+    - name: "Install Software Properties Common"
+      become: yes
+      become_method: sudo
+      apt:
+        name: software-properties-common
+
+    - name: "Install BrightBox PPA"
+      become: yes
+      become_method: sudo
+      apt_repository:
+        repo: ppa:brightbox/ruby-ng
+        update_cache: yes
 
     - name: "Install MSF dependencies from apt"
       become: yes
       become_method: sudo
       action: apt name={{ item }} state=latest
       with_items:
-        - build-essential
-        - libreadline-dev
-        - libssl-dev
-        - libpq5
-        - libpq-dev
-        - libreadline5
-        - libsqlite3-dev
-        - libpcap-dev
-        - openjdk-7-jre
-        - git-core
+        - ruby2.1
+        - bundler
+        - ruby2.1-dev
+        - bison
+        - flex
         - autoconf
-        - postgresql
-        - pgadmin3
-        - curl
-        - zlib1g-dev
-        - libxml2-dev
-        - libxslt1-dev
-        - vncviewer
-        - libyaml-dev
+        - automake
 
-    # Install RVM and Ruby from task file
-    - include: tasks/install_rvm_and_ruby.yml
+    # Create directories
+    - name: "Create Omnibus Directory"
+      become: yes
+      become_method: sudo
+      file:
+        path: /var/cache/omnibus/
+        state: directory
+        owner: "{{ remote_user_account }}"
 
-    # Setup PostgreSQL from task file
-    - include: tasks/configure_postgresql_for_msf.yml
+    - name: "Create MSF Framework Directory"
+      become: yes
+      become_method: sudo
+      file:
+        path: /opt/metasploit-framework/
+        state: directory
+        owner: "{{ remote_user_account }}"
 
-    # Clone Metasploit
-    - name: "Clone Metasploit"
+    - name: "Configure git Username"
+      become: yes
+      become_method: sudo
+      shell: 'git config --global user.name "nobody"'
+
+    - name: "Configure git Email"
+      become: yes
+      become_method: sudo
+      shell: 'git config --global user.email "nobody@example.com"'
+
+    # Clone metasploit-omnibus repo
+    - name: "Clone Metasploit Omnibus"
       git:
-        repo: "https://github.com/rapid7/metasploit-framework.git"
-        dest: "{{ tool_install_path }}metasploit-framework/"
+        repo: "https://github.com/rapid7/metasploit-omnibus.git"
+        dest: "{{ tool_install_path }}metasploit-omnibus/"
 
-    # Install Metasploit gems
-    - name: "Specify Metasploit Gemset"
-      shell: "rvm --default use ruby-2.1.6@metasploit-framework" 
+    - name: "Execute Bundle Install"
+      become: yes
+      become_method: sudo
+      shell: "bundle install --binstubs"
       args:
-        chdir: "{{ tool_install_path }}metasploit-framework"
+        chdir: "{{ tool_install_path }}metasploit-omnibus/"
 
-    - name: "Install Metasploit Gems"
-      shell: "gem install bundler && bundle install"
+    - name: "Build Metasploit Package with Omnibus"
+      become: yes
+      become_method: sudo
+      shell: "bin/omnibus build metasploit-framework"
+      args:
+        chdir: "{{ tool_install_path }}metasploit-omnibus/"
+        executable: /bin/bash
+
+    - name: "Install Metasploit Package"
+      become: yes
+      become_method: sudo
+      shell: "dpkg -i {{ tool_install_path }}metasploit-omnibus/pkg/*.deb"
+
+    - name: "Move MSF database.yml"
+      shell: "mv /home/{{ remote_user_account }}/database.yml /home/{{ remote_user_account }}/.msf4/database.yml"
