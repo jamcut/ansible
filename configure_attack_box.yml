@@ -137,6 +137,11 @@
       become_method: sudo
       pip: name=AdvancedHTTPServer
 
+    - name: "Install pydispatch"
+      become: yes
+      become_method: sudo
+      pip: name=pydispatch
+
     # Install other tools
 
     # Install Nmap
