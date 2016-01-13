@@ -61,6 +61,7 @@
         - python-psycopg2
         - subversion
         - autoconf
+        - terminator
 
     # Install misc tools from git
 
