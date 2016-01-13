@@ -1,0 +1,12 @@
+---
+#### Ansible task file to install common pip modules
+# Author: @jamcut
+# Overview: Install common pip modules
+####
+
+- name: "Install AdvancedHTTPServer"
+  become: yes
+  become_method: sudo
+  pip: name={{ item }}
+  with_items:
+    - AdvancedHTTPServer

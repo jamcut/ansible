@@ -1,0 +1,19 @@
+---
+#### Ansible task file to install common packages via apt
+# Author: @jamcut
+# Overview: Install common packages with apt
+####
+
+- name: "Install Packages"
+  become: yes
+  become_method: sudo
+  action: apt name={{ item }} state=latest update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - postgresql
+    - libpq-dev
+    - python-psycopg2
+    - subversion
+    - autoconf
+    - terminator

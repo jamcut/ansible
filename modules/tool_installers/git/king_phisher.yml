@@ -1,0 +1,29 @@
+---
+#### Ansible task file to install King Phisher
+# Author: @jamcut
+# Overview: Install and configure King Phisher
+# Notes: Install only the client or server by including this play
+# with the "skip_server" or "skip_client" variables
+####
+
+- name: "Clone King Phisher"
+  git:
+    repo: "https://github.com/securestate/king-phisher.git"
+    dest: "{{ tool_install_path }}king-phisher/"
+    version: dev
+
+# Install additional packages for KP
+
+- name: "Install GEOS and Basemap with apt"
+  become: yes
+  become_method: sudo
+  action: apt name={{ item }} state=latest
+  with_items:
+    - libgeos++-dev
+    - python-mpltoolkits.basemap
+
+# Run the install script
+- name: "Install King Phisher"
+  become: yes
+  become_method: sudo
+  shell: "{{ install_path }}king-phisher/tools/install.sh -y --skip-{{ skip_option }}"

@@ -1,0 +1,87 @@
+---
+#### Ansible task file to install Metasploit using Omnibus
+# Author: @jamcut
+# Overview: Install and configure Metasploit
+# using the omnibus installer and Ruby package maintained
+# by Brightbox
+####
+
+# Install PPA from BrightBox
+- name: "Install Software Properties Common"
+  become: yes
+  become_method: sudo
+  apt:
+    name: software-properties-common
+
+- name: "Install BrightBox PPA"
+  become: yes
+  become_method: sudo
+  apt_repository:
+    repo: ppa:brightbox/ruby-ng
+    update_cache: yes
+
+- name: "Install MSF dependencies from apt"
+  become: yes
+  become_method: sudo
+  action: apt name={{ item }} state=latest
+  with_items:
+    - ruby2.1
+    - bundler
+    - ruby2.1-dev
+    - bison
+    - flex
+    - autoconf
+    - automake
+
+    # Create directories
+- name: "Create Omnibus Directory"
+  become: yes
+  become_method: sudo
+  file:
+    path: /var/cache/omnibus/
+    state: directory
+    owner: "{{ user_account }}"
+
+- name: "Create MSF Framework Directory"
+  become: yes
+  become_method: sudo
+  file:
+    path: /opt/metasploit-framework/
+    state: directory
+    owner: "{{ user_account }}"
+
+- name: "Configure git Username"
+  become: yes
+  become_method: sudo
+  shell: 'git config --global user.name "nobody"'
+
+- name: "Configure git Email"
+  become: yes
+  become_method: sudo
+  shell: 'git config --global user.email "nobody@example.com"'
+
+# Clone metasploit-omnibus repo
+- name: "Clone Metasploit Omnibus"
+  git:
+    repo: "https://github.com/rapid7/metasploit-omnibus.git"
+    dest: "{{ install_path }}metasploit-omnibus/"
+
+- name: "Execute Bundle Install"
+  become: yes
+  become_method: sudo
+  shell: "bundle install --binstubs"
+  args:
+    chdir: "{{ install_path }}metasploit-omnibus/"
+
+- name: "Build Metasploit Package with Omnibus"
+  become: yes
+  become_method: sudo
+  shell: "bin/omnibus build metasploit-framework"
+  args:
+    chdir: "{{ install_path }}metasploit-omnibus/"
+    executable: /bin/bash
+
+- name: "Install Metasploit Package"
+  become: yes
+  become_method: sudo
+  shell: "dpkg -i {{ install_path }}metasploit-omnibus/pkg/*.deb"

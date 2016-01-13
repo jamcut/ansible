@@ -1,0 +1,10 @@
+---
+#### Ansible task file to install recon-ng
+# Author: @jamcut
+# Overview: Install recon-ng from source
+####
+
+- name: "Install recon-ng"
+  git:
+    repo: "https://bitbucket.org/LaNMaSteR53/recon-ng.git"
+    dest: "{{ install_path }}recon-ng/"

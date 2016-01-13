@@ -1,0 +1,76 @@
+---
+#### Ansible playbook to configure a new attack box
+# Author: @jamcut
+# Version: 0.3
+# Overview: Playbook to install some common attack tools on a fresh box
+# Notes:
+# - Run this playbook with the "--ask-become-pass" switch which 
+#   will prompt you for a sudo password to do things as root.
+# - The "hosts" and "remote_user" parameters as well as all
+#   of the variables will need to be set before running.
+# 
+# To Do:
+# - Install additional packages through pip and pat
+# - Add additional tools as identified/needed
+####
+
+- name: Configure New Attack Box
+  hosts: tests
+  remote_user: jamcut
+
+# Configure variables
+  vars:
+    tool_install_path: "/tmp/Tools/"
+    remote_user_account: jamcut
+    king_phisher_skip_option: server
+    empire_staging_key: "RANDOM"
+    msf_db_name: msf
+    msf_db_user: msf
+    msf_db_pass: msf
+
+
+  handlers:
+
+    - name: "Start PostgreSQL"
+      become: yes
+      become_method: sudo
+      service: name=postgresql state=started
+
+  tasks:
+
+    # Update apt cache and installed packages
+    - include: ../modules/package_installers/apt_update_dist_upgrade.yml
+
+    # Install common packages with apt
+    - include: ../modules/package_installers/apt_get_install.yml
+
+    # Install pip modules
+    - include: ../modules/package_installers/pip_modules.yml 
+
+    # Install misc tools from git
+
+    # Have the king_phisher_skip_component variable set correctly
+    - include: ../modules/tool_installers/git/king_phisher.yml install_path={{ tool_install_path }} skip_option={{ king_phisher_skip_component }}
+
+    # Uncomment the following line to skip installing the KP client
+    - include: ../modules/tool_installers/git/king_phisher.yml install_path={{ tool_install_path }} skip_client={{ skip_king_phisher_client }}
+
+    - include: ../modules/tool_installers/git/nikto.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/responder.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/recon_ng.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/sqlmap.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/poshsec.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/powersploit.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/powertools.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/git/empire.yml install_path={{ tool_install_path }} staging_key={{ empire_staging_key }}
+
+    # Install other tools
+    - include: ../modules/tool_installers/nmap.yml install_path={{ tool_install_path }}
+
+    # Install Metasploit
+    - include: ../modules/tool_installers/metasploit_omnibus.yml install_path={{ tool_install_path }} user_account={{ remote_user_account }}
+
+    # Setup PostgreSQL from task file
+    - include: ../modules/misc_tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }} user_account={{ remote_user_account }}
+      notify:
+        - Start PostgreSQL

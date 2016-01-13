@@ -1,0 +1,15 @@
+---
+#### Ansible task file to install PowerShell Empire
+# Author: @jamcut
+# Overview: Install and configure Empire
+# Notes: Pass in the "staging_key" variable when including this file.
+# If set to "RANDOM", Empire will randomly generate a key 
+####
+
+- name: "Install PowerShell Empire"
+  git:
+    repo: "https://github.com/PowerShellEmpire/Empire.git"
+    dest: "{{ install_path }}Empire/"
+
+# Until I can figure out a good way to install via Ansible...
+- debug: msg="Empire successfully cloned.  You still need to manually run install.sh."

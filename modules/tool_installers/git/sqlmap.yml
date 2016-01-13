@@ -1,0 +1,10 @@
+---
+#### Ansible task file to install sqlmap
+# Author: @jamcut
+# Overview: Install sqlmap from source
+####
+
+- name: "Install sqlmap"
+  git:
+    repo: "https://github.com/sqlmapproject/sqlmap.git"
+    dest: "{{ install_path }}sqlmap/"

@@ -1,0 +1,9 @@
+---
+#### Ansible task file to install Responder
+# Author: @jamcut
+# Overview: Install Responder from source
+####
+- name: "Install Responder"
+  git:
+    repo: "https://github.com/SpiderLabs/Responder.git"
+    dest: "{{ install_path }}Responder/"

@@ -1,0 +1,18 @@
+---
+#### Ansible task file to update apt cache
+# and software packages
+# Author: @jamcut
+# Overview: apt-get update && apt-get dist-upgrade
+####
+
+- name: "Update apt cache"
+  become: yes
+  become_method: sudo
+  apt:
+    update_cache: "yes"
+
+- name: "Update software packages"
+  become: yes
+  become_method: sudo
+  apt:
+    upgrade: "dist"

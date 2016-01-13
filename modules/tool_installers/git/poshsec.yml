@@ -1,0 +1,9 @@
+---
+#### Ansible task file to Install PoshSec
+# Author: @jamcut
+# Overview: Install PoshSec from source
+####
+- name: "Install PoshSec"
+  git:
+    repo: "https://github.com/PoshSec/PoshSec.git"
+    dest: "{{ install_path }}PoshSec/"

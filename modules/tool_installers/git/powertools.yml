@@ -1,0 +1,9 @@
+---
+#### Ansible task file to Install PowerTools
+# Author: @jamcut
+# Overview: Install PowerTools from source
+####
+- name: "Install PowerTools"
+  git:
+    repo: "https://github.com/PowerShellEmpire/PowerTools.git"
+    dest: "{{ install_path }}PowerTools/"

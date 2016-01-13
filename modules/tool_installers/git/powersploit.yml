@@ -1,0 +1,9 @@
+---
+#### Ansible task file to Install PowerSploit
+# Author: @jamcut
+# Overview: Install PowerSploit from source
+####
+- name: "Install PowerSploit"
+  git:
+    repo: "https://github.com/PowerShellMafia/PowerSploit.git"
+    dest: "{{ install_path }}PowerSploit/"

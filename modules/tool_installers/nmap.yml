@@ -1,0 +1,27 @@
+---
+#### Ansible task file to install Nmap
+# Author: @jamcut
+# Overview: Install Nmap from source
+####
+
+- name: "Check Out Nmap"
+  subversion:
+    repo: https://svn.nmap.org/nmap
+    dest: "{{ install_path }}nmap/"
+
+- name: "Configure Nmap"
+  shell: "./configure"
+  args:
+    chdir: "{{ install_path }}nmap/"
+
+- name: "Make Nmap"
+  shell: "make"
+  args:
+    chdir: "{{ install_path }}nmap/"
+
+- name: "Make Install Nmap"
+  become: yes
+  become_method: sudo
+  shell: "make install"
+  args:
+    chdir: "{{ install_path}}nmap/"

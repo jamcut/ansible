@@ -1,0 +1,10 @@
+---
+#### Ansible task file to install nikto
+# Author: @jamcut
+# Overview: Install nikto from source
+####
+
+- name: "Install nikto"
+  git:
+    repo: "https://github.com/sullo/nikto.git"
+    dest: "{{ install_path }}nikto/"
