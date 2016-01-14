@@ -2,8 +2,12 @@
 #### Ansible task file to install PowerShell Empire
 # Author: @jamcut
 # Overview: Install and configure Empire
-# Notes: Pass in the "staging_key" variable when including this file.
-# If set to "RANDOM", Empire will randomly generate a key 
+# Notes:
+# - Pass in the "staging_key" variable when including this file.
+#   If set to "RANDOM", Empire will randomly generate a key.
+# - Currently this task will not install Empire because I havent
+#   found a good way of dealing with the prompts.  The "expect"
+#   module does not appear to work. 
 ####
 
 - name: "Install PowerShell Empire"

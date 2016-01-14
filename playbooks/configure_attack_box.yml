@@ -12,6 +12,7 @@
 # To Do:
 # - Install additional packages through pip and pat
 # - Add additional tools as identified/needed
+# - Figure out how to actually install Empire via ansible
 ####
 
 - name: Configure New Attack Box
@@ -62,7 +63,7 @@
     - include: ../modules/tool_installers/git/poshsec.yml install_path={{ tool_install_path }}
     - include: ../modules/tool_installers/git/powersploit.yml install_path={{ tool_install_path }}
     - include: ../modules/tool_installers/git/powertools.yml install_path={{ tool_install_path }}
-    - include: ../modules/tool_installers/git/empire.yml install_path={{ tool_install_path }} staging_key={{ empire_staging_key }}
+    - include: ../modules/tool_installers/git/empire.yml install_path={{ tool_install_path }} emp_key={{ empire_staging_key }}
 
     # Install other tools
     - include: ../modules/tool_installers/nmap.yml install_path={{ tool_install_path }}
