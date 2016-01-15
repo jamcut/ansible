@@ -1,7 +1,7 @@
 ---
 #### Ansible playbook to configure a new attack box
 # Author: @jamcut
-# Version: 0.
+# Version: 0.4
 # Overview: Playbook to install some common attack tools on a fresh box
 # Notes:
 # - Run this playbook with the "--ask-become-pass" switch which 
