@@ -1,7 +1,7 @@
 ---
 #### Ansible playbook to configure a new attack box
 # Author: @jamcut
-# Version: 0.3
+# Version: 0.
 # Overview: Playbook to install some common attack tools on a fresh box
 # Notes:
 # - Run this playbook with the "--ask-become-pass" switch which 
@@ -10,9 +10,8 @@
 #   of the variables will need to be set before running.
 # 
 # To Do:
-# - Install additional packages through pip and pat
+# - Install additional packages through pip and apt
 # - Add additional tools as identified/needed
-# - Figure out how to actually install Empire via ansible
 ####
 
 - name: Configure New Attack Box

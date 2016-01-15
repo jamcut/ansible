@@ -15,5 +15,34 @@
     repo: "https://github.com/PowerShellEmpire/Empire.git"
     dest: "{{ install_path }}Empire/"
 
-# Until I can figure out a good way to install via Ansible...
-- debug: msg="Empire successfully cloned.  You still need to manually run install.sh."
+# Basically doing all of the install steps manually.  Janky, I know...
+- name: "Install Empire Requirements from apt"
+  become: yes
+  become_method: sudo
+  action: apt name={{ item }} state=latest update_cache=yes
+  with_items:
+    - python-dev
+    - python-m2crypto
+    - swig
+    - libpq-dev
+
+- name: "Install Empire Requirements from git"
+  become: yes
+  become_method: sudo
+  pip: name={{ item }}
+  with_items:
+    - pycrypto
+    - iptools
+    - pydispatcher
+
+- name: "Setup Database for Empire"
+  become: yes
+  become_method: sudo
+  shell: STAGING_KEY={{ emp_key }} python setup_database.py
+  args:
+    chdir: "{{ install_path }}Empire/setup/"
+
+- name: "Create Certificate for Empire"
+  become: yes
+  become_method: sudo
+  shell: "{{ install_path }}Empire/setup/cert.sh"
