@@ -8,25 +8,21 @@
 #   will prompt you for a sudo password to do things as root.
 # - The "hosts" and "remote_user" parameters as well as all
 #   of the variables will need to be set before running.
-# 
-# To Do:
-# - Install additional packages through pip and apt
-# - Add additional tools as identified/needed
 ####
 
 - name: Configure New Attack Box
-  hosts: tests
-  remote_user: jamcut
+  hosts: UPDATE
+  remote_user: UPDATE
 
 # Configure variables
   vars:
-    tool_install_path: "/tmp/Tools/"
-    remote_user_account: jamcut
-    king_phisher_skip_option: server
-    empire_staging_key: "RANDOM"
-    msf_db_name: msf
-    msf_db_user: msf
-    msf_db_pass: msf
+    tool_install_path: "UPDATE"
+    remote_user_account: UPDATE
+    king_phisher_skip_option: UPDATE
+    empire_staging_key: "UPDATE"
+    msf_db_name: UPDATE
+    msf_db_user: UPDATE
+    msf_db_pass: UPDATE
 
 
   handlers:
