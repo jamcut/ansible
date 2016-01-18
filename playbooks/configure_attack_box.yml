@@ -55,9 +55,7 @@
     # Have the king_phisher_skip_component variable set correctly
     - include: ../modules/tool_installers/git/king_phisher.yml install_path={{ tool_install_path }} skip_option={{ king_phisher_skip_component }}
 
-    # Uncomment the following line to skip installing the KP client
-    - include: ../modules/tool_installers/git/king_phisher.yml install_path={{ tool_install_path }} skip_client={{ skip_king_phisher_client }}
-
+    # Install tools from git
     - include: ../modules/tool_installers/git/nikto.yml install_path={{ tool_install_path }}
     - include: ../modules/tool_installers/git/responder.yml install_path={{ tool_install_path }}
     - include: ../modules/tool_installers/git/recon_ng.yml install_path={{ tool_install_path }}
