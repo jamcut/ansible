@@ -17,13 +17,20 @@
 # Configure variables
   vars:
     tool_install_path: "UPDATE"
+
+    # Used to build directory structure, probably should be the same as the "remote_user" parameter above
     remote_user_account: UPDATE
+
+    # Set this to either "client" or "server" depending on what you want to skip
     king_phisher_skip_option: UPDATE
+
+    # Set to "RANDOM" to allow Empire to randomly generate a key
     empire_staging_key: "UPDATE"
+
+    # DB, user, and pass for MSF database
     msf_db_name: UPDATE
     msf_db_user: UPDATE
     msf_db_pass: UPDATE
-
 
   handlers:
 
