@@ -22,7 +22,7 @@
     remote_user_account: UPDATE
 
     # Set this to either "client" or "server" depending on what you want to skip
-    king_phisher_skip_option: UPDATE
+    king_phisher_skip_component: UPDATE
 
     # Set to "RANDOM" to allow Empire to randomly generate a key
     empire_staging_key: "UPDATE"
