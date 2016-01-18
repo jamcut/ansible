@@ -15,6 +15,23 @@ This is a playbook that will bootstrap a new attack system from a fresh install.
   - I was not able to install the necessary gems as an underprivileged user, so MSF will likely have to be run with sudo because of this.  This would be necessary if you wanted to bind to a privileged port anyway.
 In the future I may rework the playbook to assume the user will be running everything as root.
 
-## To Do
+#### Prereqs
+- SSH access to the system to be configured
+- [Ansible inventory](http://docs.ansible.com/ansible/intro_inventory.html) file in the following format:
+<pre>
+[GROUP]
+IP_Address
+IP_Address
+...
+</pre>
+  - Where "GROUP" is whatever you set for the [host parameter](https://github.com/jamcut/ansible/blob/master/playbooks/configure_attack_box.yml#L14) in the playbook file.
+
+#### Running
+Run the playbook from the "playbooks" directory with the following command:
+<pre>
+user@system~ansible/playbooks ansible-playbook -i INVENTORY_FILE configure_attack_box.yml --ask-become-pass
+</pre>
+
+#### To Do
 - Continue to add tools and packages to the installer
 - ~~Make the playbook modular consisting of multiple plays which can be run independently of each other~~
