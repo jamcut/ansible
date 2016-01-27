@@ -5,8 +5,8 @@
 ####
 
 - name: "Install Packages"
-  become: yes
-  become_method: sudo
+  #become: yes
+  #become_method: sudo
   action: apt name={{ item }} state=latest update_cache=yes
   with_items:
     - git

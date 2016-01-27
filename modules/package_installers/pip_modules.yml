@@ -5,8 +5,8 @@
 ####
 
 - name: "Install AdvancedHTTPServer"
-  become: yes
-  become_method: sudo
+  #become: yes
+  #become_method: sudo
   pip: name={{ item }}
   with_items:
     - AdvancedHTTPServer

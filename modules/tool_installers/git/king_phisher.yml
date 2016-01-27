@@ -15,8 +15,8 @@
 # Install additional packages for KP
 
 - name: "Install GEOS and Basemap with apt"
-  become: yes
-  become_method: sudo
+  #become: yes
+  #become_method: sudo
   action: apt name={{ item }} state=latest
   with_items:
     - libgeos++-dev
@@ -24,6 +24,6 @@
 
 # Run the install script
 - name: "Install King Phisher"
-  become: yes
-  become_method: sudo
+  #become: yes
+  #become_method: sudo
   shell: "{{ install_path }}king-phisher/tools/install.sh -y --skip-{{ skip_option }}"
