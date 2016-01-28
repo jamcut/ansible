@@ -1,13 +1,8 @@
 ---
 #### Ansible playbook to configure a new attack box
 # Author: @jamcut
-# Version: 0.4
-# Overview: Playbook to install some common attack tools on a fresh box
-# Notes:
-# - Run this playbook with the "--ask-become-pass" switch which 
-#   will prompt you for a sudo password to do things as root.
-# - The "hosts" and "remote_user" parameters as well as all
-#   of the variables will need to be set before running.
+# Overview: Playbook to install some common attack tools on
+# a fresh box.  Meant to be run as 'root'.
 ####
 
 - name: Configure New Attack Box
@@ -58,9 +53,9 @@
     - include: ../modules/tool_installers/nmap.yml install_path={{ tool_install_path }}
 
     # Install Metasploit
-    - include: ../modules/tool_installers/metasploit_omnibus.yml install_path={{ tool_install_path }} user_account={{ remote_user_account }}
+    - include: ../modules/tool_installers/metasploit_omnibus.yml install_path={{ tool_install_path }}
 
     # Setup PostgreSQL from task file
-    - include: ../modules/misc_tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }} user_account={{ remote_user_account }}
+    - include: ../modules/misc_tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }}
       notify:
         - Start PostgreSQL
