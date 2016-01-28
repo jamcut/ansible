@@ -35,6 +35,8 @@
 
     # Install common packages with apt
     - include: ../modules/package_installers/apt_get_install.yml
+      notify:
+        - Start PostgreSQL
 
     # Install pip modules
     - include: ../modules/package_installers/pip_modules.yml 
