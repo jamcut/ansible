@@ -1,7 +1,6 @@
 ---
 #### Ansible task file to configure PostgreSQL for MSF
 # Author: @jamcut
-# Version: 0.2
 # Overview: Tasks to configure PostgreSQL before installing MSF
 # Notes: Include this task file in a Ansible playbook.
 #        Assumes PostgreSQL is installed
@@ -32,13 +31,11 @@
     - "'  password: {{ db_pass }}'"
     - "'  host: 127.0.0.1'"
     - "'  port: 5432'"
-    - "'  pool: 75'"
+    - "'  pool: 100'"
     - "'  timeout: 5'"
 
 # Move the database.yml to the needed location
 - name: "Move MSF database.yml"
-  become: yes
-  become_method: sudo
-  shell: "mv /home/{{ user_account }}/database.yml /opt/metasploit-framework/embedded/framework/config/database.yml"
+  shell: "mv ~/database.yml /opt/metasploit-framework/embedded/framework/config/database.yml"
   args:
     executable: /bin/bash

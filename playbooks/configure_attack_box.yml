@@ -13,17 +13,10 @@
 - name: Configure New Attack Box
   hosts: localhost
   connection: local
-#  remote_user: root
 
 # Configure variables
   vars:
     tool_install_path: "~/Tools/"
-
-    # Used to build directory structure, probably should be the same as the "remote_user" parameter above
-    #remote_user_account: jamcut
-
-    # Set this to either "client" or "server" depending on what you want to skip
-    #king_phisher_skip_component: server
 
     # Set to "RANDOM" to allow Empire to randomly generate a key
     empire_staging_key: "RANDOM"
@@ -51,11 +44,6 @@
     # Install pip modules
     - include: ../modules/package_installers/pip_modules.yml 
 
-    # Install misc tools from git
-
-    # Have the king_phisher_skip_component variable set correctly
-    #- include: ../modules/tool_installers/git/king_phisher.yml install_path={{ tool_install_path }} skip_option={{ king_phisher_skip_component }}
-
     # Install tools from git
     - include: ../modules/tool_installers/git/nikto.yml install_path={{ tool_install_path }}
     - include: ../modules/tool_installers/git/responder.yml install_path={{ tool_install_path }}
@@ -67,12 +55,12 @@
     - include: ../modules/tool_installers/git/empire.yml install_path={{ tool_install_path }} emp_key={{ empire_staging_key }}
 
     # Install other tools
-    #- include: ../modules/tool_installers/nmap.yml install_path={{ tool_install_path }}
+    - include: ../modules/tool_installers/nmap.yml install_path={{ tool_install_path }}
 
     # Install Metasploit
-    #- include: ../modules/tool_installers/metasploit_omnibus.yml install_path={{ tool_install_path }} user_account={{ remote_user_account }}
+    - include: ../modules/tool_installers/metasploit_omnibus.yml install_path={{ tool_install_path }} user_account={{ remote_user_account }}
 
     # Setup PostgreSQL from task file
-    #- include: ../modules/misc_tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }} user_account={{ remote_user_account }}
-    #  notify:
-    #    - Start PostgreSQL
+    - include: ../modules/misc_tasks/configure_postgresql_for_msf.yml db_name={{ msf_db_name }} db_user={{ msf_db_user }} db_pass={{ msf_db_pass }} user_account={{ remote_user_account }}
+      notify:
+        - Start PostgreSQL
