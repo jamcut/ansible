@@ -31,8 +31,7 @@
   tasks:
 
   # Update all packages with dnf and update db for mlocate
-    - name: "Update installed 
-    llpackages"
+    - name: "Update installed packages"
       become: yes
       become_method: sudo
       dnf: name=* state=latest
