@@ -26,7 +26,7 @@
     - swig
     - libpq-dev
 
-- name: "Install Empire Requirements from git"
+- name: "Install Empire Requirements from pip"
   become: yes
   become_method: sudo
   pip: name={{ item }}
@@ -34,6 +34,7 @@
     - pycrypto
     - iptools
     - pydispatcher
+    - flask
 
 - name: "Setup Database for Empire"
   become: yes
