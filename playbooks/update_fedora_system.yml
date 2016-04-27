@@ -41,7 +41,7 @@
       become_method: sudo
       shell: "updatedb"
 
-  # Update tools in the /opt/ directory
+  # Update tools in the $base_install_dir directory
     - name: "Update King Phisher"
       git: repo=https://github.com/securestate/king-phisher.git dest={{ base_install_dir }}king-phisher update=yes version=dev
 
